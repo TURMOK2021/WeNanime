@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Directorio de animes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+</head>
+<body>
+    <div class="conteiner">
+        <div class="row">
+            <div class="container mt-5">
+                <h1 class="mb-4">Directorio de animes</h1>
+                <div class="row" id="animeContainer"></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 col-md-6 col-12">
+                    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="infoModalLabel">Información del Anime</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                
+                                <div class="modal-body">
+                                    <div id="modalTitulo"></div>
+                                    <div id="modalEstudio"></div>
+                                    <div id="modalAño"></div>
+                                    <div id="modalPuntuacion"></div>
+                                    <div id="modalCapitulos"></div>
+                                    <div id="modalGenero"></div>
+                                    <div id="modalDescripcion"></div>
+                                    <div id="modalTituloOriginal"></div>
+                                    <img id="modalImagen" src="" alt="Imagen del Anime">
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js" integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa" crossorigin="anonymous"></script>
+
+        <script>
+            
+            Promise.all([
+                fetch('animes.json').then(response => response.json()),
+                fetch('modales.json').then(response => response.json())
+            ])
+            .then(([animes, modales]) => {
+                const animeContainer = document.getElementById('animeContainer');
+
+                
+                animes.forEach((anime, index) => {
+                    const modalInfo = modales[index]; 
+
+                    
+                    const card = document.createElement('div');
+                    card.classList.add('col-xl-2','col-lg-4', 'col-md-6', 'col-sm-6');
+
+                    card.innerHTML = `
+                    <div class="row">
+                        
+                                <div class="card">
+                                    <img src="${anime.Póster}" class="card-img-top" alt="Póster del Anime">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${anime.Nombre}</h5>
+                                        <h5 class="card-title">${anime.Estudio}</h5>
+                                        <h5 class="card-title">${anime.Año}</h5>
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#infoModal" data-anime='${JSON.stringify({ ...anime, ...modalInfo })}'>Ver Detalles</button>
+                                    </div>
+                                </div>
+                    </div>
+                    `;
+
+                    animeContainer.appendChild(card);
+                });
+
+                    const infoModal = new bootstrap.Modal(document.getElementById('infoModal'));
+                infoModal._element.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const animeData = JSON.parse(button.getAttribute('data-anime'));
+                    document.getElementById('modalTitulo').textContent = animeData.Nombre;
+                    
+                    document.getElementById('modalPuntuacion').textContent = animeData.Puntuación;
+                    document.getElementById('modalCapitulos').textContent = animeData.Capítulos;
+                    document.getElementById('modalGenero').textContent = animeData.Género;
+                    document.getElementById('modalDescripcion').textContent = animeData.Descripción;
+                    document.getElementById('modalTituloOriginal').textContent = animeData['Título Original'];
+                    document.getElementById('modalImagen').src = animeData.Póster;
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar el JSON:', error);
+            });
+        </script>
+    
+</body>
+</html>
